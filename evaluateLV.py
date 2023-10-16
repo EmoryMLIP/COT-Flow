@@ -16,7 +16,7 @@ import lib.utils as utils
 
 cf = config.getconfig()
 
-parser = argparse.ArgumentParser('OT-Flow')
+parser = argparse.ArgumentParser('COT-Flow')
 parser.add_argument('--resume', type=str, default="experiments/cnf/tabcond/lv/...")
 parser.add_argument('--prec', type=str, default='single', choices=['None', 'single', 'double'], help="overwrite trained precision")
 parser.add_argument('--gpu' , type=int, default=0)
@@ -217,7 +217,7 @@ if __name__ == '__main__':
     cvt = lambda x: x.type(argPrec).to(device, non_blocking=True)
 
     # load training mean and standard deviation
-    dataset_load = scipy.io.loadmat('.../OT-Flow/datasets/lv_data.mat')
+    dataset_load = scipy.io.loadmat('.../COT-Flow/datasets/lv_data.mat')
     x_train = dataset_load['x_train']
     y_train = dataset_load['y_train']
     dataset = np.concatenate((x_train, y_train), axis=1)
@@ -234,17 +234,17 @@ if __name__ == '__main__':
     """Test Generated Sample"""
 
     StochLV = StochasticLotkaVolterra()
-    path_theta1 = '.../OT-Flow/experiments/cnf/tabcond/lv/StochasticLV_ABCsamples01.pk'
+    path_theta1 = '.../COT-Flow/datasets/StochasticLV_ABCsamples01.pk'
     theta1 = np.array([0.01, 0.5, 1, 0.01])
     experiment_lv(StochLV, path_theta1, theta1, net_x, train_mean, train_std, checkpt)
 
-    path_theta2 = '.../OT-Flow/experiments/cnf/tabcond/lv/StochasticLV_ABCsamples015NewTheta.pk'
+    path_theta2 = '.../COT-Flow/datasets/StochasticLV_ABCsamples015NewTheta.pk'
     theta2 = np.array([0.02, 0.02, 0.02, 0.02])
     experiment_lv(StochLV, path_theta2, theta2, net_x, train_mean, train_std, checkpt)
 
     """Density Estimation"""
 
-    test_dataset_load = scipy.io.loadmat('.../OT-Flow/datasets/lv_test_data.mat')
+    test_dataset_load = scipy.io.loadmat('.../COT-Flow/datasets/lv_test_data.mat')
     test_dat = test_dataset_load['test_data']
     # log transformation over theta
     test_dat[:, :4] = np.log(test_dat[:, :4])

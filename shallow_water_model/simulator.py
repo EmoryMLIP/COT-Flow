@@ -10,7 +10,7 @@ import numpy as np
 from scipy.fft import fft2
 
 # TODO change to correct paths
-path_to_fcode = '.../OT-Flow/shallow_water_model/shallow_water01_modified.f90'
+path_to_fcode = '.../COT-Flow/shallow_water_model/shallow_water01_modified.f90'
 
 
 def observation_noise(

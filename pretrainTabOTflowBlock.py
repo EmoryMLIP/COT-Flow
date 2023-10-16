@@ -9,7 +9,7 @@ from src.OTFlowProblem import *
 from src.Phi import *
 from lib.tabloader import tabloader
 
-parser = argparse.ArgumentParser('OT-Flow')
+parser = argparse.ArgumentParser('COT-Flow')
 parser.add_argument(
     '--data', choices=['wt_wine', 'rd_wine', 'parkinson'], type=str, default='rd_wine'
 )

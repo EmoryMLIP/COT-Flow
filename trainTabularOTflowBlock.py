@@ -13,7 +13,7 @@ from src.OTFlowProblem import *
 from src.Phi import *
 from lib.tabloader import tabloader
 
-parser = argparse.ArgumentParser('OT-Flow')
+parser = argparse.ArgumentParser('COT-Flow')
 parser.add_argument(
     '--data', choices=['wt_wine', 'rd_wine', 'parkinson'], type=str, default='rd_wine'
 )
@@ -450,7 +450,7 @@ if __name__ == '__main__':
                         test_hist = pd.DataFrame(columns=columns_test)
                         test_hist.loc[len(test_hist.index)] = [args.alph, args.batch_size, args.lr, args.m, args.nt,
                                                                NLL, MMD, time_meter.sum, itr]
-                        testfile_name = '/local/scratch3/zwan736/OT-Flow/experiments/cnf/tabjoint/' + args.data + '_test_hist.csv'
+                        testfile_name = '.../COT-Flow/experiments/cnf/tabjoint/' + args.data + '_test_hist.csv'
                         if os.path.isfile(testfile_name):
                             test_hist.to_csv(testfile_name, mode='a', index=False, header=False)
                         else:
@@ -476,7 +476,7 @@ if __name__ == '__main__':
                         test_hist = pd.DataFrame(columns=columns_test)
                         test_hist.loc[len(test_hist.index)] = [args.alph, args.batch_size, args.lr, args.m, args.nt,
                                                                NLL, MMD, time_meter.sum, itr]
-                        testfile_name = '/local/scratch3/zwan736/OT-Flow/experiments/cnf/tabjoint/' + args.data + '_test_hist.csv'
+                        testfile_name = '.../COT-Flow/experiments/cnf/tabjoint/' + args.data + '_test_hist.csv'
                         if os.path.isfile(testfile_name):
                             test_hist.to_csv(testfile_name, mode='a', index=False, header=False)
                         else:
@@ -510,7 +510,7 @@ if __name__ == '__main__':
     test_hist = pd.DataFrame(columns=columns_test)
     test_hist.loc[len(test_hist.index)] = [args.alph, args.batch_size, args.lr, args.m, args.nt, NLL, MMD,
                                            time_meter.sum, itr]
-    testfile_name = '/local/scratch3/zwan736/OT-Flow/experiments/cnf/tabjoint/' + args.data + '_test_hist.csv'
+    testfile_name = '.../COT-Flow/experiments/cnf/tabjoint/' + args.data + '_test_hist.csv'
     if os.path.isfile(testfile_name):
         test_hist.to_csv(testfile_name, mode='a', index=False, header=False)
     else:

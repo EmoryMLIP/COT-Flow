@@ -1,5 +1,3 @@
-# trainOTflowCond.py
-# train COT-Flow for small tabular datasets and the stochastic Lotka-Volterra problem
 import argparse
 import os
 import pandas as pd
@@ -97,7 +95,7 @@ def load_data(data, test_ratio, valid_ratio, batch_size, random_state):
 
     if data == 'lv':
         # TODO change to correct path
-        dataset_load = scipy.io.loadmat('.../OT-Flow/datasets/training_data.mat')
+        dataset_load = scipy.io.loadmat('.../COT-Flow/datasets/training_data.mat')
         x_train = dataset_load['x_train']
         y_train = dataset_load['y_train']
         dataset = np.concatenate((x_train, y_train), axis=1)
@@ -387,7 +385,7 @@ if __name__ == '__main__':
                         test_hist = pd.DataFrame(columns=columns_test)
                         test_hist.loc[len(test_hist.index)] = [args.alph, args.batch_size, args.lr, args.m, args.nt,
                                                                NLL, MMD, time_meter.sum, itr]
-                        testfile_name = '.../OT-Flow/experiments/cnf/tabcond/' + args.data + '_test_hist.csv'
+                        testfile_name = '.../COT-Flow/experiments/cnf/tabcond/' + args.data + '_test_hist.csv'
                         if os.path.isfile(testfile_name):
                             test_hist.to_csv(testfile_name, mode='a', index=False, header=False)
                         else:
@@ -419,7 +417,7 @@ if __name__ == '__main__':
     test_hist = pd.DataFrame(columns=columns_test)
     test_hist.loc[len(test_hist.index)] = [args.alph, args.batch_size, args.lr, args.m, args.nt, NLL, MMD,
                                            time_meter.sum, itr]
-    testfile_name = '.../OT-Flow/experiments/cnf/tabcond/' + args.data + '_test_hist.csv'
+    testfile_name = '.../COT-Flow/experiments/cnf/tabcond/' + args.data + '_test_hist.csv'
     if os.path.isfile(testfile_name):
         test_hist.to_csv(testfile_name, mode='a', index=False, header=False)
     else:

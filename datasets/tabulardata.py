@@ -10,7 +10,7 @@ def get_wt_wine():
     returns white wine quality dataset from UCI
     with labels removed
     """
-    dataset = pd.read_csv('.../OT-Flow/datasets/winequality-white.csv', sep=';')
+    dataset = pd.read_csv('.../COT-Flow/datasets/winequality-white.csv', sep=';')
     features = np.delete(dataset.values, -1, axis=1)
     return features
 
@@ -20,7 +20,7 @@ def get_rd_wine():
     returns red wine quality dataset from UCI
     with labels removed
     """
-    dataset = pd.read_csv('.../OT-Flow/datasets/winequality-red.csv', sep=';')
+    dataset = pd.read_csv('.../COT-Flow/datasets/winequality-red.csv', sep=';')
     features = np.delete(dataset.values, -1, axis=1)
     return features
 
@@ -30,7 +30,7 @@ def get_parkinson():
     returns parkinson telemonitoring dataset from UCI
     with last column removed
     """
-    dataset = pd.read_csv('.../OT-Flow/datasets/parkinsons_updrs.csv', sep=',')
+    dataset = pd.read_csv('.../COT-Flow/datasets/parkinsons_updrs.csv', sep=',')
     features = np.delete(dataset.values, [0, 1, 2], axis=1)
     return features
 
@@ -39,7 +39,7 @@ def get_concrete():
     """
     returns concrete dataset from UCI
     """
-    dataset = pd.read_excel('.../OT-Flow/datasets/Concrete_Data.xls').to_numpy()
+    dataset = pd.read_excel('.../COT-Flow/datasets/Concrete_Data.xls').to_numpy()
     return dataset
 
 
@@ -47,7 +47,7 @@ def get_energy():
     """
     returns energy dataset from UCI
     """
-    dataset = pd.read_excel('.../OT-Flow/datasets/ENB2012_data.xlsx').to_numpy()
+    dataset = pd.read_excel('.../COT-Flow/datasets/ENB2012_data.xlsx').to_numpy()
     return dataset
 
 
@@ -55,7 +55,7 @@ def get_yacht():
     """
     returns yacht dataset from UCI
     """
-    dataset = pd.read_csv('.../OT-Flow/datasets/yacht_hydrodynamics.data', delim_whitespace=True,
+    dataset = pd.read_csv('.../COT-Flow/datasets/yacht_hydrodynamics.data', delim_whitespace=True,
                           names=['Long pos', 'Prismatic coeff',
                                  'Length-displacement ratio',
                                  'Beam-draught ratio',

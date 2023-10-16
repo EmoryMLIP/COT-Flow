@@ -12,7 +12,7 @@ device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 def create_data_swe(num_eigs, save=True):
     """Obtain Data"""
     # TODO change to correct path
-    path_to_sims = '.../OT-Flow/datasets/shallow_water_data'
+    path_to_sims = '.../COT-Flow/datasets/shallow_water_data'
 
     #  list all files whose names start with 'data_' and end in 'npz'
     files = sorted(f for f in listdir(path_to_sims) if f.startswith('data_') and f.endswith('.npz'))
@@ -71,7 +71,7 @@ def load_swdata(batch_size, full=True):
         dataset = datafile['dataset']
         Vs = torch.FloatTensor(datafile['Vs'])
     else:
-        path_to_sims = '.../OT-Flow/datasets/shallow_water_data/'
+        path_to_sims = '.../COT-Flow/datasets/shallow_water_data/'
         files = sorted(f for f in os.listdir(path_to_sims) if f.endswith(".npz"))
 
         # Load data sequentially from files

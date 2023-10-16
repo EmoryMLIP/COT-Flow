@@ -4,9 +4,9 @@ import pandas as pd
 
 # TODO: Change to correct paths
 
-loss_pk = pd.read_csv('.../OT-Flow/experiments/cnf/tabjoint/parkinson_valid_hist.csv').to_numpy()
-loss_rd = pd.read_csv('.../OT-Flow/experiments/cnf/tabjoint/rd_wine_valid_hist.csv').to_numpy()
-loss_wt = pd.read_csv('.../OT-Flow/experiments/cnf/tabjoint/wt_wine_valid_hist.csv').to_numpy()
+loss_pk = pd.read_csv('.../COT-Flow/experiments/cnf/tabjoint/parkinson_valid_hist.csv').to_numpy()
+loss_rd = pd.read_csv('.../COT-Flow/experiments/cnf/tabjoint/rd_wine_valid_hist.csv').to_numpy()
+loss_wt = pd.read_csv('.../COT-Flow/experiments/cnf/tabjoint/wt_wine_valid_hist.csv').to_numpy()
 loss_pk_min = np.sort(loss_pk[:, -1])[:10]
 loss_rd_min = np.sort(loss_rd[:, -1])[:10]
 loss_wt_min = np.sort(loss_wt[:, -1])[:10]
@@ -17,9 +17,9 @@ indx_pk = np.where(loss_pk[:, -1] == loss_pk_min)[-1]
 indx_rd = np.where(loss_rd[:, -1] == loss_rd_min)[-1]
 indx_wt = np.where(loss_wt[:, -1] == loss_wt_min)[-1]
 
-param_pk = pd.read_csv('.../OT-Flow/experiments/cnf/tabjoint/parkinson_params_hist.csv').to_numpy()
-param_rd = pd.read_csv('.../OT-Flow/experiments/cnf/tabjoint/rd_wine_params_hist.csv').to_numpy()
-param_wt = pd.read_csv('.../OT-Flow/experiments/cnf/tabjoint/wt_wine_params_hist.csv').to_numpy()
+param_pk = pd.read_csv('.../COT-Flow/experiments/cnf/tabjoint/parkinson_params_hist.csv').to_numpy()
+param_rd = pd.read_csv('.../COT-Flow/experiments/cnf/tabjoint/rd_wine_params_hist.csv').to_numpy()
+param_wt = pd.read_csv('.../COT-Flow/experiments/cnf/tabjoint/wt_wine_params_hist.csv').to_numpy()
 param_pk_list = param_pk[indx_pk]
 param_rd_list = param_rd[indx_rd]
 param_wt_list = param_wt[indx_wt]

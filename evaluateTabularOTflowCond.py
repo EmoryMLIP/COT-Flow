@@ -8,7 +8,7 @@ import config
 
 cf = config.getconfig()
 
-parser = argparse.ArgumentParser('OT-Flow')
+parser = argparse.ArgumentParser('COT-Flow')
 parser.add_argument(
     '--data', choices=['concrete', 'energy', 'yacht'], type=str, default='concrete'
 )

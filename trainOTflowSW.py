@@ -1,5 +1,3 @@
-# trainOTflowCond_SW.py
-# train COT-Flow for the 1D shallow water problem
 import argparse
 import os
 import pandas as pd

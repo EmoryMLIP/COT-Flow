@@ -45,7 +45,7 @@ def _fwd_pass_fourier(profile, seedz):
 
 def wave_wout_noise(theta):
     # abs path to solver
-    path_to_fcode = '.../OT-Flow/shallow_water_model/shallow_water01_modified.f90'
+    path_to_fcode = '.../COT-Flow/shallow_water_model/shallow_water01_modified.f90'
     # load solver
     try:
         sw = import_module("shallow_water")
@@ -173,9 +173,9 @@ if __name__ == '__main__':
     """Grab Training Mean and STD"""
 
     # TODO change to correct path
-    file_path = '.../OT-Flow/datasets/shallow_water_data3500.npz'
-    file_path50k = '.../OT-Flow/datasets/shallow_water_data3500_50k.npz'
-    file_path20k = '.../OT-Flow/datasets/shallow_water_data3500_20k.npz'
+    file_path = '.../COT-Flow/datasets/shallow_water_data3500.npz'
+    file_path50k = '.../COT-Flow/datasets/shallow_water_data3500_50k.npz'
+    file_path20k = '.../COT-Flow/datasets/shallow_water_data3500_20k.npz'
 
     train_data, Vs, train_mean, train_std = load_data_info(file_path, 0.05)
     train_data_50k, Vs50k, train_mean_50k, train_std_50k = load_data_info(file_path50k, 0.05)
@@ -282,7 +282,7 @@ if __name__ == '__main__':
 
     """Perform SBC Analysis"""
 
-    path_to_samps = '.../OT-Flow/datasets/sw_test_data.npz'
+    path_to_samps = '.../COT-Flow/datasets/sw_test_data.npz'
     ranks, _ = get_rank_statistic(checkpt, Vx, net_x, net_y, train_mean, train_std, path_to_samps)
 
     # plot ranks

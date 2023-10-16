@@ -82,47 +82,47 @@ class RunningAverageMeter(object):
 def count_parameters(model):
     return sum(p.numel() for p in model.parameters() if p.requires_grad)
 
-#
-# def inf_generator(iterable):
-#     """Allows training with DataLoaders in a single infinite loop:
-#         for i, (x, y) in enumerate(inf_generator(train_loader)):
-#     """
-#     iterator = iterable.__iter__()
-#     while True:
-#         try:
-#             yield iterator.__next__()
-#         except StopIteration:
-#             iterator = iterable.__iter__()
-#
-#
-# def save_checkpoint(state, save, epoch):
-#     if not os.path.exists(save):
-#         os.makedirs(save)
-#     filename = os.path.join(save, 'checkpt-%04d.pth' % epoch)
-#     torch.save(state, filename)
-#
-#
-# def isnan(tensor):
-#     return (tensor != tensor)
-#
-#
-# def logsumexp(value, dim=None, keepdim=False):
-#     """Numerically stable implementation of the operation
-#     value.exp().sum(dim, keepdim).log()
-#     """
-#     if dim is not None:
-#         m, _ = torch.max(value, dim=dim, keepdim=True)
-#         value0 = value - m
-#         if keepdim is False:
-#             m = m.squeeze(dim)
-#         return m + torch.log(torch.sum(torch.exp(value0), dim=dim, keepdim=keepdim))
-#     else:
-#         m = torch.max(value)
-#         sum_exp = torch.sum(torch.exp(value - m))
-#         if isinstance(sum_exp, Number):
-#             return m + math.log(sum_exp)
-#         else:
-#             return m + torch.log(sum_exp)
-#
-#
-#
+
+def inf_generator(iterable):
+    """Allows training with DataLoaders in a single infinite loop:
+        for i, (x, y) in enumerate(inf_generator(train_loader)):
+    """
+    iterator = iterable.__iter__()
+    while True:
+        try:
+            yield iterator.__next__()
+        except StopIteration:
+            iterator = iterable.__iter__()
+
+
+def save_checkpoint(state, save, epoch):
+    if not os.path.exists(save):
+        os.makedirs(save)
+    filename = os.path.join(save, 'checkpt-%04d.pth' % epoch)
+    torch.save(state, filename)
+
+
+def isnan(tensor):
+    return (tensor != tensor)
+
+
+def logsumexp(value, dim=None, keepdim=False):
+    """Numerically stable implementation of the operation
+    value.exp().sum(dim, keepdim).log()
+    """
+    if dim is not None:
+        m, _ = torch.max(value, dim=dim, keepdim=True)
+        value0 = value - m
+        if keepdim is False:
+            m = m.squeeze(dim)
+        return m + torch.log(torch.sum(torch.exp(value0), dim=dim, keepdim=keepdim))
+    else:
+        m = torch.max(value)
+        sum_exp = torch.sum(torch.exp(value - m))
+        if isinstance(sum_exp, Number):
+            return m + math.log(sum_exp)
+        else:
+            return m + torch.log(sum_exp)
+
+
+

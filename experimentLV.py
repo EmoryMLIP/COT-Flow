@@ -2,10 +2,10 @@ import os
 import numpy as np
 import pandas as pd
 
-loss = pd.read_csv('.../OT-Flow/experiments/cnf/tabcond/lv_valid_hist.csv').to_numpy()
+loss = pd.read_csv('.../COT-Flow/experiments/cnf/tabcond/lv_valid_hist.csv').to_numpy()
 loss_min = np.sort(loss[:, -1])[0]
 indx = np.where(loss[:, -1] == loss_min)[-1]
-param = pd.read_csv('.../OT-Flow/experiments/cnf/tabcond/lv_params_hist.csv').to_numpy()
+param = pd.read_csv('.../COT-Flow/experiments/cnf/tabcond/lv_params_hist.csv').to_numpy()
 param_train = param[indx].squeeze()
 
 width = int(param_train[4])

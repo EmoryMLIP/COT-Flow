@@ -4,9 +4,9 @@ import pandas as pd
 
 # TODO: Change to correct paths
 
-loss_con = pd.read_csv('.../OT-Flow/experiments/cnf/tabcond/concrete_valid_hist.csv').to_numpy()
-loss_enr = pd.read_csv('.../OT-Flow/experiments/cnf/tabcond/energy_valid_hist.csv').to_numpy()
-loss_yat = pd.read_csv('.../OT-Flow/experiments/cnf/tabcond/yacht_valid_hist.csv').to_numpy()
+loss_con = pd.read_csv('.../COT-Flow/experiments/cnf/tabcond/concrete_valid_hist.csv').to_numpy()
+loss_enr = pd.read_csv('.../COT-Flow/experiments/cnf/tabcond/energy_valid_hist.csv').to_numpy()
+loss_yat = pd.read_csv('.../COT-Flow/experiments/cnf/tabcond/yacht_valid_hist.csv').to_numpy()
 loss_con_min = np.sort(loss_con[:, -1])[:10]
 loss_enr_min = np.sort(loss_enr[:, -1])[:10]
 loss_yat_min = np.sort(loss_yat[:, -1])[:10]
@@ -17,9 +17,9 @@ indx_con = np.where(loss_con[:, -1] == loss_con_min)[-1]
 indx_enr = np.where(loss_enr[:, -1] == loss_enr_min)[-1]
 indx_yat = np.where(loss_yat[:, -1] == loss_yat_min)[-1]
 
-param_con = pd.read_csv('.../OT-Flow/experiments/cnf/tabcond/concrete_params_hist.csv').to_numpy()
-param_enr = pd.read_csv('.../OT-Flow/experiments/cnf/tabcond/energy_params_hist.csv').to_numpy()
-param_yat = pd.read_csv('.../OT-Flow/experiments/cnf/tabcond/yacht_params_hist.csv').to_numpy()
+param_con = pd.read_csv('.../COT-Flow/experiments/cnf/tabcond/concrete_params_hist.csv').to_numpy()
+param_enr = pd.read_csv('.../COT-Flow/experiments/cnf/tabcond/energy_params_hist.csv').to_numpy()
+param_yat = pd.read_csv('.../COT-Flow/experiments/cnf/tabcond/yacht_params_hist.csv').to_numpy()
 param_con_list = param_con[indx_con]
 param_enr_list = param_enr[indx_enr]
 param_yat_list = param_yat[indx_yat]

@@ -10,7 +10,7 @@ import config
 
 cf = config.getconfig()
 
-parser = argparse.ArgumentParser('OT-Flow')
+parser = argparse.ArgumentParser('COT-Flow')
 parser.add_argument(
     '--data', choices=['parkinson', 'rd_wine', 'wt_wine'], type=str, default='parkinson'
 )
