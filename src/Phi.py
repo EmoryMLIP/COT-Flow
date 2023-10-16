@@ -12,7 +12,7 @@ def derivTanh(x): # act'' aka the second derivative of the activation function a
     return 1 - torch.pow( torch.tanh(x) , 2 )
 
 class ResNN(nn.Module):
-    def __init__(self, d, m, nTh=2):
+    def __init__(self, m, dx, dy=0, nTh=2):
         """
             ResNet N portion of Phi
         :param d:   int, dimension of space input (expect inputs to be d+1 for space-time)
@@ -25,35 +25,40 @@ class ResNN(nn.Module):
             print("nTh must be an integer >= 2")
             exit(1)
 
-        self.d = d
+        self.dx = dx
+        self.dy = dy
         self.m = m
         self.nTh = nTh
         self.layers = nn.ModuleList([])
-        self.layers.append(nn.Linear(d + 1, m, bias=True)) # opening layer
+        self.layers.append(nn.Linear(dx + dy + 1, m, bias=True)) # opening layer
         self.layers.append(nn.Linear(m,m, bias=True)) # resnet layers
         for i in range(nTh-2):
             self.layers.append(copy.deepcopy(self.layers[1]))
         self.act = antiderivTanh
         self.h = 1.0 / (self.nTh-1) # step size for the ResNet
 
-    def forward(self, x):
+    def forward(self, x, y=None):
         """
             N(s;theta). the forward propogation of the ResNet
         :param x: tensor nex-by-d+1, inputs
         :return:  tensor nex-by-m,   outputs
         """
+        if y is not None:
+            xy = torch.cat((x,y),1)
+        else:
+            xy = x
 
-        x = self.act(self.layers[0].forward(x))
+        xy = self.act(self.layers[0].forward(xy))
 
         for i in range(1,self.nTh):
-            x = x + self.h * self.act(self.layers[i](x))
+            xy = xy + self.h * self.act(self.layers[i](xy))
 
-        return x
+        return xy
 
 
 
 class Phi(nn.Module):
-    def __init__(self, nTh, m, d, r=10, alph=[1.0] * 5):
+    def __init__(self, nTh, m, dx,dy=0, r=10, alph=[1.0] * 5):
         """
             neural network approximating Phi (see Eq. (9) in our paper)
 
@@ -69,17 +74,18 @@ class Phi(nn.Module):
 
         self.m    = m
         self.nTh  = nTh
-        self.d    = d
+        self.dx = dx
+        self.dy = dy
         self.alph = alph
 
-        r = min(r,d+1) # if number of dimensions is smaller than default r, use that
+        r = min(r,dx+dy+1) # if number of dimensions is smaller than default r, use that
 
-        self.A  = nn.Parameter(torch.zeros(r, d+1) , requires_grad=True)
+        self.A  = nn.Parameter(torch.zeros(r, dx + dy+1) , requires_grad=True)
         self.A  = nn.init.xavier_uniform_(self.A)
-        self.c  = nn.Linear( d+1  , 1  , bias=True)  # b'*[x;t] + c
+        self.c  = nn.Linear( dx+dy+1  , 1  , bias=True)  # b'*[x;t] + c
         self.w  = nn.Linear( m    , 1  , bias=False)
 
-        self.N = ResNN(d, m, nTh=nTh)
+        self.N = ResNN(m, dx,dy, nTh=nTh)
 
         # set initial values
         self.w.weight.data = torch.ones(self.w.weight.data.shape)
@@ -88,16 +94,20 @@ class Phi(nn.Module):
 
 
 
-    def forward(self, x):
+    def forward(self, x, y=None):
         """ calculating Phi(s, theta)...not used in OT-Flow """
+        if y is not None:
+            xy = torch.cat((x,y),1)
+        else:
+            xy = x
 
         # force A to be symmetric
         symA = torch.matmul(torch.t(self.A), self.A) # A'A
 
-        return self.w( self.N(x)) + 0.5 * torch.sum( torch.matmul(x , symA) * x , dim=1, keepdims=True) + self.c(x)
+        return self.w( self.N(x,y)) + 0.5 * torch.sum( torch.matmul(xy , symA) * xy , dim=1, keepdims=True) + self.c(xy)
 
 
-    def trHess(self,x, justGrad=False ):
+    def trHess(self,x,y, justGrad=False ):
         """
         compute gradient of Phi wrt x and trace(Hessian of Phi); see Eq. (11) and Eq. (13), respectively
         recomputes the forward propogation portions of Phi
@@ -110,10 +120,15 @@ class Phi(nn.Module):
         # code in E = eye(d+1,d) as index slicing instead of matrix multiplication
         # assumes specific N.act as the antiderivative of tanh
 
+        if y is not None:
+            xy = torch.cat((x,y),1)
+        else:
+            xy = x
+
         N    = self.N
         m    = N.layers[0].weight.shape[0]
         nex  = x.shape[0] # number of examples in the batch
-        d    = x.shape[1]-1
+        dx    = x.shape[1]-1
         symA = torch.matmul(self.A.t(), self.A)
 
         u = [] # hold the u_0,u_1,...,u_M for the forward pass
@@ -121,7 +136,7 @@ class Phi(nn.Module):
         # preallocate z because we will store in the backward pass and we want the indices to match the paper
 
         # Forward of ResNet N and fill u
-        opening     = N.layers[0].forward(x) # K_0 * S + b_0
+        opening     = N.layers[0].forward(xy) # K_0 * S + b_0
         u.append(N.act(opening)) # u0
         feat = u[0]
 
@@ -144,7 +159,7 @@ class Phi(nn.Module):
 
         # z_0 = K_0' diag(...) z_1
         z[0] = torch.mm( N.layers[0].weight.t() , tanhopen.t() * z[1] )
-        grad = z[0] + torch.mm(symA, x.t() ) + self.c.weight.t()
+        grad = z[0] + torch.mm(symA, xy.t() ) + self.c.weight.t()
 
         if justGrad:
             return grad.t()
@@ -154,7 +169,7 @@ class Phi(nn.Module):
         #-----------------
 
         # t_0, the trace of the opening layer
-        Kopen = N.layers[0].weight[:,0:d]    # indexed version of Kopen = torch.mm( N.layers[0].weight, E  )
+        Kopen = N.layers[0].weight[:,0:dx]    # indexed version of Kopen = torch.mm( N.layers[0].weight, E  )
         temp  = derivTanh(opening.t()) * z[1]
         trH  = torch.sum(temp.reshape(m, -1, nex) * torch.pow(Kopen.unsqueeze(2), 2), dim=(0, 1)) # trH = t_0
 
@@ -178,7 +193,7 @@ class Phi(nn.Module):
             trH  = trH + N.h * t_i  # add t_i to the accumulate trace
             Jac = Jac + N.h * torch.tanh(temp).reshape(m, -1, nex) * KJ # update Jacobian
 
-        return grad.t(), trH + torch.trace(symA[0:d,0:d])
+        return grad.t(), trH + torch.trace(symA[0:dx,0:dx])
         # indexed version of: return grad.t() ,  trH + torch.trace( torch.mm( E.t() , torch.mm(  symA , E) ) )
 
 
@@ -189,10 +204,11 @@ if __name__ == "__main__":
     import math
 
     # test case
-    d = 2
+    dx = 2
+    dy = 10
     m = 5
 
-    net = Phi(nTh=2, m=m, d=d)
+    net = Phi(nTh=2, m=m, dx=dx,dy=dy)
     net.N.layers[0].weight.data  = 0.1 + 0.0 * net.N.layers[0].weight.data
     net.N.layers[0].bias.data    = 0.2 + 0.0 * net.N.layers[0].bias.data
     net.N.layers[1].weight.data  = 0.3 + 0.0 * net.N.layers[1].weight.data
@@ -200,25 +216,27 @@ if __name__ == "__main__":
 
     # number of samples-by-(d+1)
     x = torch.Tensor([[1.0 ,4.0 , 0.5],[2.0,5.0,0.6],[3.0,6.0,0.7],[0.0,0.0,0.0]])
-    y = net(x)
-    print(y)
+    y = torch.randn(x.shape[0],dy)
+    z = net(x,y)
+    print(z)
 
     # test timings
-    d = 400
+    dx = 400
     m = 32
     nex = 1000
 
-    net = Phi(nTh=5, m=m, d=d)
+    net = Phi(nTh=5, m=m, dx=dx,dy=dy)
     net.eval()
-    x = torch.randn(nex,d+1)
-    y = net(x)
+    x = torch.randn(nex,dx+1)
+    y = torch.randn(nex, dy)
+    z = net(x,y)
 
     end = time.time()
-    g,h = net.trHess(x)
+    g,h = net.trHess(x,y)
     print('traceHess takes ', time.time()-end)
 
     end = time.time()
-    g = net.trHess(x, justGrad=True)
+    g = net.trHess(x,y, justGrad=True)
     print('JustGrad takes  ', time.time()-end)
 
 

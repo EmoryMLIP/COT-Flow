@@ -4,9 +4,9 @@ try:
     matplotlib.use('TkAgg')
     import matplotlib.pyplot as plt
 except:
-    import matplotlib
-    matplotlib.use('agg') # for linux server with no tkinter
-    import matplotlib.pyplot as plt
+    matplotlib.use('Agg') # for linux server with no tkinter
+matplotlib.use('Agg') # assume no tkinter
+import matplotlib.pyplot as plt
 plt.rcParams['image.cmap'] = 'inferno'
 from src.OTFlowProblem import *
 import numpy as np
@@ -17,23 +17,22 @@ from torch.nn.functional import pad
 from matplotlib import colors # for evaluateLarge
 
 
-
-def plot4(net, x, y, nt_val, sPath, sTitle="", doPaths=False):
+def plot4(net, x, y, z, nt_val, sPath, sTitle="", doPaths=False):
     """
     x - samples from rho_0
-    y - samples from rho_1
+    y - condition
+    z - samples from rho_1
     nt_val - number of time steps
     """
 
-    d = net.d
+    dx = net.dx
     nSamples = x.shape[0]
 
+    fx = integrate(x[:, :dx].view(-1, dx), y, net, [0.0, 1.0], nt_val, stepper="rk4", alph=net.alph)
+    finvfx = integrate(fx[:, :dx].view(-1, dx), y, net, [1.0, 0.0], nt_val, stepper="rk4", alph=net.alph)
+    genModel = integrate(z[:, :dx].view(-1, dx), y, net, [1.0, 0.0], nt_val, stepper="rk4", alph=net.alph)
 
-    fx = integrate(x[:, 0:d], net, [0.0, 1.0], nt_val, stepper="rk4", alph=net.alph)
-    finvfx = integrate(fx[:, 0:d], net, [1.0, 0.0], nt_val, stepper="rk4", alph=net.alph)
-    genModel = integrate(y[:, 0:d], net, [1.0, 0.0], nt_val, stepper="rk4", alph=net.alph)
-
-    invErr = torch.norm(x[:,0:d] - finvfx[:,0:d]) / x.shape[0]
+    invErr = torch.norm(x[:, :dx].view(-1, dx) - finvfx[:, :dx].view(-1, dx)) / x.shape[0]
 
     nBins = 33
     LOWX  = -4
@@ -41,22 +40,22 @@ def plot4(net, x, y, nt_val, sPath, sTitle="", doPaths=False):
     LOWY  = -4
     HIGHY = 4
 
-    if d > 50: # assuming bsds
-        # plot dimensions d1 vs d2 
+    if dx > 50: # assuming bsds
+        # plot dimensions d1 vs d2
         d1=0
         d2=1
         LOWX  = -0.15   # note: there's a hard coded 4 and -4 in axs 2
         HIGHX = 0.15
         LOWY  = -0.15
         HIGHY = 0.15
-    if d > 700: # assuming MNIST
+    if dx > 700:  # assuming MNIST
         d1=0
         d2=1
         LOWX  = -10   # note: there's a hard coded 4 and -4 in axs 2
         HIGHX = 10
         LOWY  = -10
         HIGHY = 10
-    elif d==8: # assuming gas
+    elif dx == 8:  # assuming gas
         LOWX  = -2   # note: there's a hard coded 4 and -4 in axs 2
         HIGHX =  2
         LOWY  = -2
@@ -73,32 +72,148 @@ def plot4(net, x, y, nt_val, sPath, sTitle="", doPaths=False):
     fig.suptitle(sTitle + ', inv err {:.2e}'.format(invErr))
 
     # hist, xbins, ybins, im = axs[0, 0].hist2d(x.numpy()[:,0],x.numpy()[:,1], range=[[LOW, HIGH], [LOW, HIGH]], bins = nBins)
-    im1 , _, _, map1 = axs[0, 0].hist2d(x.detach().cpu().numpy()[:, d1], x.detach().cpu().numpy()[:, d2], range=[[LOWX, HIGHX], [LOWY, HIGHY]], bins=nBins)
+    im1, _, _, map1 = axs[0, 0].hist2d(x.detach().cpu().numpy()[:, d1], y.detach().cpu().numpy()[:, d2],
+                                       range=[[LOWX, HIGHX], [LOWY, HIGHY]], bins=nBins)
     axs[0, 0].set_title('x from rho_0')
-    im2 , _, _, map2 = axs[0, 1].hist2d(fx.detach().cpu().numpy()[:, d1], fx.detach().cpu().numpy()[:, d2], range=[[-4, 4], [-4, 4]], bins = nBins)
+    im2, _, _, map2 = axs[0, 1].hist2d(fx.detach().cpu().numpy()[:, d1], y.detach().cpu().numpy()[:, d2],
+                                       range=[[-4, 4], [-4, 4]], bins=nBins)
     axs[0, 1].set_title('f(x)')
-    im3 , _, _, map3 = axs[1, 0].hist2d(finvfx.detach().cpu().numpy()[: ,d1] ,finvfx.detach().cpu().numpy()[: ,d2], range=[[LOWX, HIGHX], [LOWY, HIGHY]], bins = nBins)
+    im3, _, _, map3 = axs[1, 0].hist2d(finvfx.detach().cpu().numpy()[:, d1], y.detach().cpu().numpy()[:, d2],
+                                       range=[[LOWX, HIGHX], [LOWY, HIGHY]], bins=nBins)
     axs[1, 0].set_title('finv( f(x) )')
-    im4 , _, _, map4 = axs[1, 1].hist2d(genModel.detach().cpu().numpy()[:, d1], genModel.detach().cpu().numpy()[:, d2], range=[[LOWX, HIGHX], [LOWY, HIGHY]], bins = nBins)
+    im4, _, _, map4 = axs[1, 1].hist2d(genModel.detach().cpu().numpy()[:, d1], y.detach().cpu().numpy()[:, d2],
+                                       range=[[LOWX, HIGHX], [LOWY, HIGHY]], bins=nBins)
     axs[1, 1].set_title('finv( y from rho1 )')
 
-    fig.colorbar(map1, cax=fig.add_axes([0.47, 0.53, 0.02, 0.35]) )
-    fig.colorbar(map2, cax=fig.add_axes([0.89, 0.53, 0.02, 0.35]) )
-    fig.colorbar(map3, cax=fig.add_axes([0.47, 0.11, 0.02, 0.35]) )
-    fig.colorbar(map4, cax=fig.add_axes([0.89, 0.11, 0.02, 0.35]) )
-
+    fig.colorbar(map1, cax=fig.add_axes([0.47, 0.53, 0.02, 0.35]))
+    fig.colorbar(map2, cax=fig.add_axes([0.89, 0.53, 0.02, 0.35]))
+    fig.colorbar(map3, cax=fig.add_axes([0.47, 0.11, 0.02, 0.35]))
+    fig.colorbar(map4, cax=fig.add_axes([0.89, 0.11, 0.02, 0.35]))
 
     # plot paths
-    if doPaths:
-        forwPath = integrate(x[:, 0:d], net, [0.0, 1.0], nt_val, stepper="rk4", alph=net.alph, intermediates=True)
-        backPath = integrate(fx[:, 0:d], net, [1.0, 0.0], nt_val, stepper="rk4", alph=net.alph, intermediates=True)
+    if False and doPaths:
+        forwPath = integrate(x[:, 0:dx].view(-1, dx), y, net, [0.0, 1.0], nt_val, stepper="rk4", alph=net.alph,
+                             intermediates=True)
+        backPath = integrate(fx[:, 0:dx].view(-1, dx), y, net, [1.0, 0.0], nt_val, stepper="rk4", alph=net.alph,
+                             intermediates=True)
 
         # plot the forward and inverse trajectories of several points; white is forward, red is inverse
         nPts = 10
         pts = np.unique(np.random.randint(nSamples, size=nPts))
         for pt in pts:
-            axs[0, 0].plot(forwPath[pt, 0, :].detach().cpu().numpy(), forwPath[pt, 1, :].detach().cpu().numpy(), color='white', linewidth=4)
-            axs[0, 0].plot(backPath[pt, 0, :].detach().cpu().numpy(), backPath[pt, 1, :].detach().cpu().numpy(), color='red', linewidth=2)
+            axs[0, 0].plot(forwPath[pt, 0, :].detach().cpu().numpy(), forwPath[pt, 1, :].detach().cpu().numpy(),
+                           color='white', linewidth=4)
+            axs[0, 0].plot(backPath[pt, 0, :].detach().cpu().numpy(), backPath[pt, 1, :].detach().cpu().numpy(),
+                           color='red', linewidth=2)
+
+    for i in range(axs.shape[0]):
+        for j in range(axs.shape[1]):
+            # axs[i, j].get_yaxis().set_visible(False)
+            # axs[i, j].get_xaxis().set_visible(False)
+            axs[i, j].set_aspect('equal')
+
+    # sPath = os.path.join(args.save, 'figs', sStartTime + '_{:04d}.png'.format(itr))
+    if not os.path.exists(os.path.dirname(sPath)):
+        os.makedirs(os.path.dirname(sPath))
+    plt.savefig(sPath, dpi=300)
+    plt.close()
+
+
+def plot4cond(net_y, net_x, y, x, z, nt_val, sPath, sTitle="", doPaths=False):
+    """
+    y - samples from pi(y)
+    x - samples from pi(x|y)
+    z - samples from N(0, I_d)
+    nt_val - number of time steps
+    """
+
+    nSamples, dx = x.shape
+    dy = y.shape[1]
+
+    fy = integrate(y, None, net_y, [0.0, 1.0], nt_val, stepper="rk4", alph=net_y.alph)
+    finvfy = integrate(fy[:, :dy].view(-1, dy), None, net_y, [1.0, 0.0], nt_val, stepper="rk4", alph=net_y.alph)
+
+    fx = integrate(x[:, :dx].view(-1, dx), y, net_x, [0.0, 1.0], nt_val, stepper="rk4", alph=net_x.alph)
+    finvfx = integrate(fx[:, :dx].view(-1, dx), y, net_x, [1.0, 0.0], nt_val, stepper="rk4", alph=net_x.alph)
+
+    gy = integrate(z[:, dx:].view(-1, dy), None, net_y, [1.0, 0.0], nt_val, stepper="rk4", alph=net_y.alph)
+    gx = integrate(z[:, :dx].view(-1, dx), gy[:, :dy].view(-1, dy), net_x, [1.0, 0.0], nt_val, stepper="rk4",
+                   alph=net_x.alph)
+
+    invErr = (torch.norm(x - finvfx[:, :dx].view(-1, dx)) + torch.norm(y - finvfy[:, :dy].view(-1, dy))) / nSamples
+
+    nBins = 33
+    LOWX = -4
+    HIGHX = 4
+    LOWY = -4
+    HIGHY = 4
+
+    if dx > 50:  # assuming bsds
+        # plot dimensions d1 vs d2
+        d1 = 0
+        d2 = 0
+        LOWX = -0.15  # note: there's a hard coded 4 and -4 in axs 2
+        HIGHX = 0.15
+        LOWY = -0.15
+        HIGHY = 0.15
+    if dx > 700:  # assuming MNIST
+        d1 = 0
+        d2 = 0
+        LOWX = -10  # note: there's a hard coded 4 and -4 in axs 2
+        HIGHX = 10
+        LOWY = -10
+        HIGHY = 10
+    elif dx == 8:  # assuming gas
+        LOWX = -2  # note: there's a hard coded 4 and -4 in axs 2
+        HIGHX = 2
+        LOWY = -2
+        HIGHY = 2
+        d1 = 2
+        d2 = 0
+        nBins = 100
+    else:
+        d1 = 0
+        d2 = 0
+
+    fig, axs = plt.subplots(2, 2)
+    fig.set_size_inches(12, 10)
+    fig.suptitle(sTitle + ', inv err {:.2e}'.format(invErr))
+
+    # hist, xbins, ybins, im = axs[0, 0].hist2d(x.numpy()[:,0],x.numpy()[:,1], range=[[LOW, HIGH], [LOW, HIGH]], bins = nBins)
+    im1, _, _, map1 = axs[0, 0].hist2d(x.detach().cpu().numpy()[:, d1], y.detach().cpu().numpy()[:, d2],
+                                       range=[[LOWX, HIGHX], [LOWY, HIGHY]], bins=nBins)
+    axs[0, 0].set_title('x from rho_0')
+    im2, _, _, map2 = axs[0, 1].hist2d(fx.detach().cpu().numpy()[:, d1], fy.detach().cpu().numpy()[:, d2],
+                                       range=[[-4, 4], [-4, 4]], bins=nBins)
+    axs[0, 1].set_title('f(x)')
+    im3, _, _, map3 = axs[1, 0].hist2d(finvfx.detach().cpu().numpy()[:, d1], finvfy.detach().cpu().numpy()[:, d2],
+                                       range=[[LOWX, HIGHX], [LOWY, HIGHY]], bins=nBins)
+    axs[1, 0].set_title('finv( f(x) )')
+    im4, _, _, map4 = axs[1, 1].hist2d(gx.detach().cpu().numpy()[:, d1], gy.detach().cpu().numpy()[:, d2],
+                                       range=[[LOWX, HIGHX], [LOWY, HIGHY]], bins=nBins)
+    axs[1, 1].set_title('finv( y from rho1 )')
+
+    fig.colorbar(map1, cax=fig.add_axes([0.47, 0.53, 0.02, 0.35]))
+    fig.colorbar(map2, cax=fig.add_axes([0.89, 0.53, 0.02, 0.35]))
+    fig.colorbar(map3, cax=fig.add_axes([0.47, 0.11, 0.02, 0.35]))
+    fig.colorbar(map4, cax=fig.add_axes([0.89, 0.11, 0.02, 0.35]))
+
+
+    # plot paths
+    if False and doPaths:
+        forwPath = integrate(x[:, 0:dx].view(-1, dx), y, net_y, [0.0, 1.0], nt_val, stepper="rk4", alph=net_y.alph,
+                             intermediates=True)
+        backPath = integrate(fx[:, 0:dx].view(-1, dx), y, net_x, [1.0, 0.0], nt_val, stepper="rk4", alph=net_x.alph,
+                             intermediates=True)
+
+        # plot the forward and inverse trajectories of several points; white is forward, red is inverse
+        nPts = 10
+        pts = np.unique(np.random.randint(nSamples, size=nPts))
+        for pt in pts:
+            axs[0, 0].plot(forwPath[pt, 0, :].detach().cpu().numpy(), forwPath[pt, 1, :].detach().cpu().numpy(),
+                           color='white', linewidth=4)
+            axs[0, 0].plot(backPath[pt, 0, :].detach().cpu().numpy(), backPath[pt, 1, :].detach().cpu().numpy(),
+                           color='red', linewidth=2)
 
     for i in range(axs.shape[0]):
         for j in range(axs.shape[1]):
