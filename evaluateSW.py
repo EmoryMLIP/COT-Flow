@@ -112,8 +112,9 @@ def plot_post_predict(axis, t, x_cond_wonoise, theta, color, y_lab=True, num_sam
         # plot simulated wave at time t
         axis.plot(x_axs, sim[t, :], c=color, lw=0.2)
     axis.set_xticks([])
+    axis.tick_params(axis='y', which='major', labelsize=24)
     if y_lab is True:
-        axis.set_ylabel("Amplitude", rotation=90, fontsize=30)
+        axis.set_ylabel("Amplitude", rotation=90, fontsize=45)
 
 
 def build_cotflow(check_point):
@@ -223,14 +224,12 @@ if __name__ == '__main__':
     theta = torch.randn(1, 14, requires_grad=True).to(device)
     theta_min = theta.clone().detach().requires_grad_(True)
 
-
     def closure():
         u = net_y(torch.tensor(x_star_processed, dtype=theta.dtype).to(device)).reshape(1, -1)
         _, cost = compute_loss(net_x, theta_min, u, nt=32)
         loss = cost[1]
         theta_min.grad = torch.autograd.grad(loss, theta_min)[0].detach()
         return loss
-
 
     optimizer = torch.optim.LBFGS([theta_min], line_search_fn="strong_wolfe", max_iter=1000000)
     optimizer.step(closure)
@@ -241,7 +240,7 @@ if __name__ == '__main__':
 
     # create plot grid for ground truth values
     fig, axs = plt.subplots(1, 5)
-    fig.set_size_inches(40, 8)
+    fig.set_size_inches(40, 7)
 
     # plot posterior samples with ground truth theta
     xx = np.linspace(1, 100, 100)
@@ -252,7 +251,8 @@ if __name__ == '__main__':
         thetai = theta_samples[i, :]
         axs[0].plot(xx, thetai, c='grey', lw=0.2)
     axs[0].set_xticks([])
-    axs[0].set_ylabel("Depth Profile", rotation=90, fontsize=30)
+    axs[0].tick_params(axis='y', which='major', labelsize=24)
+    axs[0].set_ylabel("Depth Profile", rotation=90, fontsize=45)
 
     # plot 2d inferred wave image
     sim_wave = wave_wout_noise(theta_samples[0, :].reshape(1, -1))
@@ -261,8 +261,9 @@ if __name__ == '__main__':
     axs[1].axhline(time_list[1], color=color_list[1], linewidth=4)
     axs[1].axhline(time_list[2], color=color_list[2], linewidth=4)
     axs[1].set_xticks([])
+    axs[1].tick_params(axis='y', which='major', labelsize=24)
     axs[1].margins(0.3)
-    axs[1].set_ylabel("Time", rotation=90, fontsize=30)
+    axs[1].set_ylabel("Time", rotation=90, fontsize=45)
     axs[1].invert_yaxis()
 
     # plot posterior predictives with ground truth wave
@@ -295,7 +296,7 @@ if __name__ == '__main__':
     upper = [binom(N, p=p).ppf(0.995) for p in hbb]
 
     # Plot CDF
-    fig = plt.figure(figsize=(8, 5))
+    fig = plt.figure(figsize=(8, 5.5))
     fig.tight_layout(pad=3.0)
     spec = fig.add_gridspec(ncols=1, nrows=1)
     ax = fig.add_subplot(spec[0, 0])
@@ -320,14 +321,16 @@ if __name__ == '__main__':
     # Ticks and axes
     ax.set_xticks([0, 500, 1000])
     ax.set_xlim([0, 1000])
-    ax.set_xlabel("Rank")
+    ax.tick_params(axis='x', which='major', labelsize=16)
+    ax.set_xlabel("Rank", fontsize=20)
     ax.set_yticks([0, .5, 1.])
     ax.set_ylim([0., 1.])
-    ax.set_ylabel("CDF")
+    ax.tick_params(axis='y', which='major', labelsize=16)
+    ax.set_ylabel("CDF", fontsize=20)
     # Legend
     custom_lines = [Line2D([0], [0], color="k", lw=1.5, linestyle="-"),
                     Line2D([0], [0], color='b', lw=1.5, linestyle="-")]
-    ax.legend(custom_lines, ['Uniform CDF', 'COT-Flow'])
+    ax.legend(custom_lines, ['Uniform CDF', 'COT-Flow'], fontsize=17)
 
     sPath = os.path.join(checkpt['args'].save, 'figs', checkpt['args'].data + '_cot_sbc.png')
     if not os.path.exists(os.path.dirname(sPath)):

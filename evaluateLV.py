@@ -71,7 +71,7 @@ def experiment_lv(LV, abc_dat_path, theta_star, net, trn_mean, trn_std, checkpt)
 
     """Plot posterior samples and MAP point"""
 
-    symbols = [r'$\theta_1$', r'$\theta_2$', r'$\theta_3$', r'$\theta_4$']
+    symbols = [r'$x_1$', r'$x_2$', r'$x_3$', r'$x_4$']
     log_limits = [[-5., 2.], [-5., 2.], [-5., 2.], [-5., 2.]]
     plot_matrix(theta_gen, log_limits, xtrue=theta_star_log, xmap=theta_map.squeeze(), symbols=symbols)
     sPath = os.path.join(checkpt['args'].save, 'figs', checkpt['args'].data + str(checkpt['args'].nt_val) +

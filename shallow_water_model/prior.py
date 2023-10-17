@@ -1,4 +1,5 @@
-from typing import Optiona
+# from https://github.com/mackelab/gatsbi/blob/main/gatsbi/task_utils/shallow_water_model/prior.py
+from typing import Optional
 import numpy as np
 from torch import Tensor
 
