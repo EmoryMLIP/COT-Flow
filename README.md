@@ -1,5 +1,5 @@
-# OT-Flow
-Pytorch implementation of our continuous normalizing flows regularized with optimal transport.
+# COT-Flow
+Pytorch implementation of the conditional version of the OT-Flow approach.
 
 ## Associated Publication
 
@@ -23,93 +23,78 @@ Please cite as
 	    url={https://ojs.aaai.org/index.php/AAAI/article/view/17113}, 
     }
 
+Efficient Neural Network Approaches for Conditional Optimal Transport with 
+applications in Bayesian Inference.
+
+Paper: https://arxiv.org/abs/2310.16975
+
 ## Set-up
-
-Install all the requirements:
-```
-pip install -r requirements.txt 
-```
-
-For the large data sets, you'll need to download the preprocessed data from Papamakarios's MAF paper found at https://zenodo.org/record/1161203#.XbiVGUVKhgi. Place the data in the data folder. We've done miniboone for you since it's small (and provide a pre-trained miniboone model).
 
 To run some files (e.g. the tests), you may need to add them to the path via
 ```
 export PYTHONPATH="${PYTHONPATH}:."
 ```
 
-A more in-depth setup is provided in [detailedSetup.md](detailedSetup.md).
-
-## Trace Comparison
-
-Compare our trace with the AD estimation of the trace
-```
-python compareTrace.py 
-```
-
-For Figure 2, we averaged over 20 runs with the following results
-```
-python src/plotTraceComparison.py 
-```
-
-
-
-## Toy problems
-
-Train a toy example
-```
-python trainToyOTflow.py
-```
-
-Plot results of a pre-trained example
-```
-python evaluateToyOTflow.py
-```
-
-
-## Large CNFs
+## UCI Tabular Datasets Experiments
+Perform pilot runs to search for best hyperparameter combinations:
 
 ```
-python trainLargeOTflow.py
+python pretrainTabOTflowBlock.py --data 'parkinson' --dx 8
+python pretrainTabOTflowBlock.py --data 'rd_wine' --dx 6
+python pretrainTabOTflowBlock.py --data 'wt_wine' --dx 6
+
+python pretrainOTflowCond.py --data 'concrete'
+python pretrainOTflowCond.py --data 'energy'
+python pretrainOTflowCond.py --data 'yacht'
 ```
 
-Evaluate a pre-trained model
+Perform experiments with the 10 best hyperparameter combinations from pilot runs:
 ```
-python evaluateLargeOTflow.py
-```
-
-
-
-#### Hyperparameters
-Train and Evaluate using our hyperparameters ([see detailedSetup.md](detailedSetup.md))
-
-| Data set           | Train Time Steps | Val Time Steps | Batch Size | Hidden Dim | alpha on C term | alpha on R term | Test Time Steps | Test Batch Size |
-|------------------- |----------------- |--------------- |----------- |----------- |---------------- |---------------- |---------------- |---------------- |
-| Power              |   10             |        22      |     10,000 |    128     |        500      | 5               | 24              | 120,000         |  
-| Gas                |   10             |        24      |     2,000  |    350     |       1,200     | 40              | 30              |  55,000         |
-| Hepmass            |   12             |        24      |     2,000  |    256     |        500      | 40              | 24              |  50,000         |
-| Miniboone          |   6              |        10      |     2,000  |    256     |        100      | 15              | 18              |    5,000        |
-| BSDS300            |   14             |        30      |     300    |    512     |       2,000     | 800             | 40              |   10,000        |
- 
-
-
-
-### MNIST 
-
-Train an MNIST model
-```
-python trainMnistOTflow.py
+python experimentBlock.py
+python experimentCond.py
 ```
 
-Run a pre-trained MNIST
+Evaluate the trained model
 ```
-python interpMnist.py
+python evaluateTabularOTflowCond.py
+python evaluateTabularOTflowBlock.py
 ```
 
-## Acknowledgements
+## Stochastic Lotka-Volterra Experiment
 
-This material is in part based upon work supported by the US National Science Foundation Grant DMS-1751636, the US AFOSR Grants 20RT0237 and FA9550-18-1-0167, AFOSR
-MURI FA9550-18-1-050, and ONR Grant No. N00014-18-1-
-2527. Any opinions, findings, and conclusions or recommendations expressed in this material are those of the author(s) and do not necessarily reflect the views of the funding agencies.
+Perform pilot runs to search for best hyperparameter combination:
+```
+python pretrainOTflowCond.py --data 'lv' --dx 4
+```
+
+Perform training with the best hyperparameter combination:
+```
+python experimentLV.py
+```
+
+Evaluate the trained model
+```
+python evaluateLV.py
+```
+
+## 1D Shallow Water Equations Experiment
+Perform pilot runs to search for best hyperparameter combination:
+```
+python pretrainOTflowSW
+```
+
+Perform training with the best hyperparameter combination:
+```
+python experimentSW.py
+```
+
+Evaluate the trained model
+```
+python evaluateSW.py
+```
+
+
+
 
 
 
