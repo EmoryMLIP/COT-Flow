@@ -80,7 +80,7 @@ python evaluateLV.py
 ## 1D Shallow Water Equations Experiment
 Perform pilot runs to search for best hyperparameter combination:
 ```
-python pretrainOTflowSW
+python pretrainOTflowSW.py
 ```
 
 Perform training with the best hyperparameter combination:
