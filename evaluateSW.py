@@ -44,7 +44,7 @@ def _fwd_pass_fourier(profile, seedz):
 
 
 def wave_wout_noise(theta):
-    # abs path to solver
+    # TODO change to correct path
     path_to_fcode = '.../COT-Flow/shallow_water_model/shallow_water01_modified.f90'
     # load solver
     try:
@@ -283,6 +283,7 @@ if __name__ == '__main__':
 
     """Perform SBC Analysis"""
 
+    # TODO change to correct path
     path_to_samps = '.../COT-Flow/datasets/sw_test_data.npz'
     ranks, _ = get_rank_statistic(checkpt, Vx, net_x, net_y, train_mean, train_std, path_to_samps)
 

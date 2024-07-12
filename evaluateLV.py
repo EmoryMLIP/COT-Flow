@@ -217,6 +217,7 @@ if __name__ == '__main__':
     cvt = lambda x: x.type(argPrec).to(device, non_blocking=True)
 
     # load training mean and standard deviation
+    # TODO change to correct path
     dataset_load = scipy.io.loadmat('.../COT-Flow/datasets/lv_data.mat')
     x_train = dataset_load['x_train']
     y_train = dataset_load['y_train']
@@ -233,6 +234,7 @@ if __name__ == '__main__':
 
     """Test Generated Sample"""
 
+    # TODO change to correct path
     StochLV = StochasticLotkaVolterra()
     path_theta1 = '.../COT-Flow/datasets/StochasticLV_ABCsamples01.pk'
     theta1 = np.array([0.01, 0.5, 1, 0.01])
@@ -244,6 +246,7 @@ if __name__ == '__main__':
 
     """Density Estimation"""
 
+    # TODO change to correct path
     test_dataset_load = scipy.io.loadmat('.../COT-Flow/datasets/lv_test_data.mat')
     test_dat = test_dataset_load['test_data']
     # log transformation over theta

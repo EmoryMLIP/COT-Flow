@@ -2,7 +2,7 @@ import os
 import numpy as np
 import pandas as pd
 
-# grab csvs
+# TODO change to correct path
 loss = pd.read_csv('.../COT-Flow/experiments/cnf/tabcond/sw_valid_hist.csv').to_numpy()
 loss_min = np.sort(loss[:, -1])[0]
 indx = np.where(loss[:, -1] == loss_min)[-1]

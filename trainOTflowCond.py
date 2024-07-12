@@ -95,7 +95,7 @@ def load_data(data, test_ratio, valid_ratio, batch_size, random_state):
 
     if data == 'lv':
         # TODO change to correct path
-        dataset_load = scipy.io.loadmat('.../COT-Flow/datasets/training_data.mat')
+        dataset_load = scipy.io.loadmat('.../COT-Flow/datasets/lv_data.mat')
         x_train = dataset_load['x_train']
         y_train = dataset_load['y_train']
         dataset = np.concatenate((x_train, y_train), axis=1)
