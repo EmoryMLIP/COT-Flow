@@ -180,17 +180,17 @@ def evaluate_model(nety, netx, data, batch_size, test_ratio, valid_ratio, random
         dat = load_data(data)
         dat = tabulardata.process_data(dat)
         dat = tabulardata.normalize_data(dat)
-        dat = torch.tensor(dat, dtype=torch.float32)
+        dat = torch.tensor(dat, dtype=torch.float32).to(device)
         normSamples = torch.randn(dat.shape[0], dat.shape[1]).to(device)
-        modelGen = np.zeros(normSamples.shape)
+        modelGen = torch.zeros_like(normSamples).to(device)
         zx = normSamples[:, dy:].view(-1, dx)
         zy = normSamples[:, :dy].view(-1, dy)
         finvy = integrate(zy, None, nety, [1.0, 0.0], nt_test, stepper="rk4", alph=nety.alph)
         finvx = integrate(zx, finvy[:, :dy], netx, [1.0, 0.0], nt_test, stepper="rk4", alph=netx.alph)
-        modelGen[:, :dy] = finvy[:, :dy].detach().cpu().numpy()
-        modelGen[:, dy:] = finvx[:, :dx].detach().cpu().numpy()
+        modelGen[:, :dy] = finvy[:, :dy]
+        modelGen[:, dy:] = finvx[:, :dx]
 
-        return testAlphMeterC.avg, mmd(modelGen, dat)
+        return testAlphMeterC.avg, mmd(modelGen, dat).item()
 
 
 if __name__ == '__main__':

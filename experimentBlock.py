@@ -58,17 +58,17 @@ for i in range(10):
         os.system(
             "python trainTabularOTflowBlock.py --data 'wt_wine' --dx 6 --num_epochs 1000 --drop_freq 0 \
             --val_freq 20 --weight_decay 0.0 --prec single --early_stopping 10 --lr_drop 2.0 --batch_size " + \
-            str(batch_size_rd) + " --test_batch_size " + str(batch_size_rd) + " --lr " + str(lr_rd) + " --nt " + str(nt_rd) + \
-            " --nt_val " + str(32) + " --m " + str(width_rd) + " --alph " + str(alpha_rd[0]) + ',' + str(alpha_rd[1]) + ',' + \
-            str(alpha_rd[2]) + " --save 'experiments/cnf/tabjoint/white'"
+            str(batch_size_wt) + " --test_batch_size " + str(batch_size_wt) + " --lr " + str(lr_wt) + " --nt " + str(nt_wt) + \
+            " --nt_val " + str(32) + " --m " + str(width_wt) + " --alph " + str(alpha_wt[0]) + ',' + str(alpha_wt[1]) + ',' + \
+            str(alpha_wt[2]) + " --save 'experiments/cnf/tabjoint/white'"
         )
 
         os.system(
             "python trainTabularOTflowBlock.py --data 'rd_wine' --dx 6 --num_epochs 1000 --drop_freq 0 \
             --val_freq 20 --weight_decay 0.0 --prec single --early_stopping 10 --lr_drop 2.0 --batch_size " + \
-            str(batch_size_wt) + " --test_batch_size " + str(batch_size_wt) + " --lr " + str(lr_wt) + " --nt " + str(nt_wt) + \
-            " --nt_val " + str(32) + " --m " + str(width_wt) + " --alph " + str(alpha_wt[0]) + ',' + str(alpha_wt[1]) + ',' + \
-            str(alpha_wt[2]) + " --save 'experiments/cnf/tabjoint/red'"
+            str(batch_size_rd) + " --test_batch_size " + str(batch_size_rd) + " --lr " + str(lr_rd) + " --nt " + str(nt_rd) + \
+            " --nt_val " + str(32) + " --m " + str(width_rd) + " --alph " + str(alpha_rd[0]) + ',' + str(alpha_rd[1]) + ',' + \
+            str(alpha_rd[2]) + " --save 'experiments/cnf/tabjoint/red'"
         )
 
 

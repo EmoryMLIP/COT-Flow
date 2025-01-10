@@ -179,13 +179,13 @@ def evaluate_model(net, data, batch_size, test_ratio, valid_ratio, random_state,
             testAlphMeterR.update(tst_costs_x[2].item(), nex_batch)
 
         # generate samples
-        normSamples = torch.randn(testData.shape[0], 1).to(device)
+        normSamples = torch.randn(testData.shape[0], 1)
         zx = cvt(normSamples)
         finvx = integrate(zx, testData[:, :dy].to(device), net, [1.0, 0.0], nt_test, stepper="rk4", alph=net.alph)
-        modelGen = finvx[:, :dx].detach().cpu().numpy()
+        modelGen = finvx[:, :dx]
         # compute MMD
 
-        return testAlphMeterC.avg, mmd(modelGen, testData[:, dy:])
+        return testAlphMeterC.avg, mmd(modelGen, testData[:, dy:].to(device)).item()
 
 
 if __name__ == '__main__':

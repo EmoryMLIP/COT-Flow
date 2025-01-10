@@ -83,20 +83,24 @@ def experiment_lv(LV, abc_dat_path, theta_star, net, trn_mean, trn_std, checkpt)
 
     """Plot posterior predictive"""
 
+    # Reset random seed for consistency
+    np.random.seed(93)
+
     plt.figure()
     ytrue = LV.simulate(theta_star)
     c1 = plt.plot(LV.tt, ytrue[:, 0], '-', label='Predators')
     c2 = plt.plot(LV.tt, ytrue[:, 1], '-', label='Prey')
-    for i in range(10):
+    for i in range(20):
         rand_sample = np.random.randint(low=0, high=2000, size=(1,))[0]
         xi = np.exp(theta_gen[rand_sample, :])
         yt = LV.simulate(xi)
-        plt.plot(LV.tt, yt[:, 0], '--', color=c1[0].get_color(), alpha=0.3)
-        plt.plot(LV.tt, yt[:, 1], '--', color=c2[0].get_color(), alpha=0.3)
+        plt.plot(LV.tt, yt[:, 0], '--', color=c1[0].get_color(), linewidth=1, alpha=0.3)
+        plt.plot(LV.tt, yt[:, 1], '--', color=c2[0].get_color(), linewidth=1, alpha=0.3)
     plt.xlabel('$t$', size=20)
-    plt.ylabel('$Z(t)$', size=20)
+    plt.ylabel('$S(t)$', size=20)
     plt.legend(loc='upper right')
     plt.xlim(0, 20)
+    plt.ylim(0, 400)
     sPath = os.path.join(checkpt['args'].save, 'figs', checkpt['args'].data + '_' + str(theta_star[0].item()) + '_post.png')
     if not os.path.exists(os.path.dirname(sPath)):
         os.makedirs(os.path.dirname(sPath))
